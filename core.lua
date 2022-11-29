@@ -252,6 +252,13 @@ end
 --Events
 ----------------------
 
+local function RGBPercToHex(r, g, b)
+	r = r <= 1 and r >= 0 and r or 0
+	g = g <= 1 and g >= 0 and g or 0
+	b = b <= 1 and b >= 0 and b or 0
+	return string.format("%02x%02x%02x", r*255, g*255, b*255)
+end
+
 local missTypeAllowed = {
 	--['MISS'] = { 0.50, 0.50, 0.50 },
 	['DODGE'] = { 0.50, 0.50, 0.50 },
@@ -263,6 +270,8 @@ local missTypeAllowed = {
 }
 
 local function AddMessage(message, color)
+	if not message or not color then return end
+
 	local r, g, b = 1, 1, 1
 	r, g, b = unpack(color)
 	
@@ -277,6 +286,8 @@ local function IncomingMiss(args)
 	AddMessage(message, missTypeAllowed[args.missType])
 end
 
+local format_resist = "-%s |cFF%s(%s %s)|r"
+
 local function DamageIncoming(args)
 	local message
 
@@ -285,9 +296,19 @@ local function DamageIncoming(args)
 	-- Check for resists (full and partials)
 	if (args.blocked or 0) > 0 then
 		resistType, resistedAmount = BLOCK, args.amount > 0 and args.blocked
-		print(resistType, resistedAmount, args.amount, args.blocked)
+		color = resistedAmount and { 0.60, 0.65, 1.00 } or { 0.75, 0.50, 0.50 } --show color based on full or partial block
+		
+		if resistType then
+
+			if resistedAmount then
+				message = string.format(format_resist, args.amount, RGBPercToHex(unpack(color)), resistType, resistedAmount)
+			else
+				message = resistType
+			end
+			
+			AddMessage(message, { 0.60, 0.65, 1.00 } )
+		end
 	end
-	
 end
 
 function Core.CombatLogEvent(args)
@@ -336,8 +357,6 @@ function Core:PLAYER_LOGIN()
 	--restore our frame layouts
 	RestoreLayout("xanTank-O-MaticMissFrame")
 	
-	--StartConfigmode()
-
 	Debug("Loaded", self.data.playerName, self:GetName())
 	
 	SLASH_XANTANKOMATIC1 = "/xtom";
