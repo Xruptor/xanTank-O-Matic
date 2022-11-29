@@ -48,6 +48,8 @@ local function SaveLayout(frame)
 	opt.xOfs = xOfs
 	opt.yOfs = yOfs
 	
+	xanTOM_DB[frame:GetName()] = opt
+	
 	return opt
 end
 
@@ -68,6 +70,8 @@ end
 function Core:AddFrame(opts)
 
 	local frame = CreateFrame("ScrollingMessageFrame", "xanTank-O-Matic"..opts.title, UIParent, "BackdropTemplate")
+	Core.frame = frame
+	
 	frame.locked = true
 	
 	frame.xfont = "Interface\\AddOns\\xanTank-O-Matic\\media\\HOOGE.TTF" --setting
@@ -76,10 +80,10 @@ function Core:AddFrame(opts)
 	
 	frame:SetFont(frame.xfont, frame.xfontsize, frame.xfontstyle)
 	frame:SetShadowColor(0, 0, 0, 0)
-	frame:SetFading(false)
-	frame:SetFadeDuration(0.5)
+	frame:SetFading(true)
 	frame:SetTimeVisible(3) --seting
-	frame:SetFadeDuration(3)
+	--frame:SetFadeDuration(0.5)
+	--frame:SetFadeDuration(3)
 	frame:SetMaxLines(64) --setting
 	frame:SetSpacing(2)
 	frame:SetWidth(opts.width)
@@ -148,14 +152,13 @@ function Core:AddFrame(opts)
 		if ( frame:GetParent().isMoving ) then
 			frame:GetParent().isMoving = nil
 			frame:GetParent():StopMovingOrSizing()
-			SaveLayout(frame:GetParent():GetName())
+			SaveLayout(Core.frame)
 		end
 	end)
 
 	frame.anchor:Hide()
 	frame:Show()
-	
-	Core.frame = frame
+
 end
 
 local function StartConfigmode()
@@ -178,7 +181,7 @@ local function StartConfigmode()
 		f.fs:SetFont(f.xfont, f.xfontsize, f.xfontstyle)
 		f.fs:SetPoint("BOTTOM", f , "TOP", 0, 0)
 
-		f.fs:SetText(DAMAGE)
+		f.fs:SetText(ADDON_NAME)
 		f.fs:SetTextColor(1, .1, .1, .9)
 
 		f.t = f:CreateTexture("ARTWORK")
@@ -211,7 +214,7 @@ local function StartConfigmode()
 		f:SetScript("OnDragStop", function(self)
 			if self.isMoving then return end
 			self:StopMovingOrSizing()
-			SaveLayout(self:GetName())
+			SaveLayout(f)
 		end)
 		
 		f.anchor:Show()
@@ -243,6 +246,7 @@ local function EndConfigMode()
 		f:SetScript("OnDragStop",nil)
 
 		f.anchor:Hide()
+		Core.grid:Hide()
 	else
 		print("can't be configured in combat.")
 	end
@@ -270,10 +274,12 @@ local missTypeAllowed = {
 }
 
 local function AddMessage(message, color)
-	if not message or not color then return end
+	if not message then return end
 
 	local r, g, b = 1, 1, 1
-	r, g, b = unpack(color)
+	if color then
+		r, g, b = unpack(color)
+	end
 	
 	Core.frame:AddMessage(message, r, g, b)
 end
@@ -306,7 +312,7 @@ local function DamageIncoming(args)
 				message = resistType
 			end
 			
-			AddMessage(message, { 0.60, 0.65, 1.00 } )
+			AddMessage(message)
 		end
 	end
 end
@@ -355,7 +361,7 @@ function Core:PLAYER_LOGIN()
 	xCP:RegisterCombat(self.CombatLogEvent)
 	
 	--restore our frame layouts
-	RestoreLayout("xanTank-O-MaticMissFrame")
+	RestoreLayout(self.frame)
 	
 	Debug("Loaded", self.data.playerName, self:GetName())
 	
