@@ -1,0 +1,13 @@
+## Interface: 100002
+## Title: |cffFF0000xan|rTank-O-Matic
+## Author: Xruptor
+## Version: 1.0
+## RequiredDeps: Blizzard_CombatText
+## OptionalDeps: tekDebug
+## SavedVariables: xanTOM_DB
+
+libs\LibStub\LibStub.lua
+libs\xCombatParser-1.0\xCombatParser-1.0.lua
+
+modules\grid.lua
+core.lua
