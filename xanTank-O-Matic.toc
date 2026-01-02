@@ -1,7 +1,7 @@
-## Interface: 110207, 50503, 40402, 38000, 30405, 20504, 11508
+## Interface: 120000, 110207, 50503, 40402, 38000, 30405, 20504, 11508
 ## Title: |cffFF0000xan|rTank-O-Matic
 ## Author: Xruptor
-## Version: 1.4
+## Version: 1.5
 ## RequiredDeps: Blizzard_CombatText
 ## OptionalDeps: tekDebug
 ## SavedVariables: xanTOM_DB
